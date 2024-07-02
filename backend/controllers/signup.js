@@ -46,14 +46,11 @@ signuprouter.post("/",async (req,res)=>{
             });
             
             const token=jwt.sign({userId:user._id},process.env.JWT_SECRET);
-            res.cookie("jwt",token,{
-                httpOnly:true
-            });
-            res.cookie("role",user.role,{
-                httpOnly:true
-            });
+           
             res.status(201).json({
-                msg:"User created"
+                msg:"User created",
+                token:token,
+                role:user.role
             })
         })
     }

@@ -31,8 +31,8 @@ adminrouter.put("/:id", async (req,res)=>{
     const user = await User.findById(req.params.id);
       
     if (user) {
-      user.firstName = req.body.firstName || user.firstName;
-      user.lastName = req.body.lastName || user.lastName;
+      user.firstname = req.body.firstname || user.firstname;
+      user.lastname = req.body.lastname || user.lastname;
       user.email = req.body.email || user.email;
       user.role = req.body.role || user.role;
   
@@ -51,7 +51,7 @@ adminrouter.put("/:id", async (req,res)=>{
         const user = await User.findById(req.params.id);
       
         if (user) {
-          await user.remove();
+          await user.deleteOne();
           res.json({ message: 'User removed' });
         } else {
           res.status(404).json({ message: 'User not found' });

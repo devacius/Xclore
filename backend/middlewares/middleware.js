@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 dotenv.config({ path: ".env.local" });
 
 const authMiddleware = (req, res, next) => {
-    const token = req.cookies.jwt;
+    const token = req.headers.authorization;
 
     if (token) {
         try {
@@ -23,7 +23,7 @@ const authMiddleware = (req, res, next) => {
 };
 
 const adminMiddleware = (req, res, next) => {
-    const role = req.cookies.role;
+    const role = req.headers.role;
     if ( role === "admin") {
         next();
     } else {

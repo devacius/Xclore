@@ -40,20 +40,18 @@ signinrouter.post('/',async (req,res)=>{
             })
         }
         const token=jwt.sign({userId:user._id},process.env.JWT_SECRET);
-        res.cookie("jwt",token,{
-            httpOnly:true
-        });
-        res.cookie("role",user.role,{
-            httpOnly:true
-        }); 
+        
         res.status(200).json({
-            msg:"User signed in"
+            msg:"User signed in",
+            token:token,
+            role:user.role
         })
     })  
    }
    catch(err){
     return res.status(500).json({
-        msg:"Internal Server Error"
+        msg:"Internal Server Error",
+        
     })
    };
 });
