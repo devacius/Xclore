@@ -5,14 +5,21 @@ import ModalClose from '@mui/joy/ModalClose';
 import Button from '@mui/joy/Button';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
+import { useNavigate } from 'react-router-dom';
+import TextField from '@mui/material/TextField';
+import TablePagination from '@mui/material/TablePagination';
 
 const GetUsers = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Function to fetch users data from backend API
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -23,31 +30,36 @@ const GetUsers = () => {
             role: role
           }
         });
-        setUsers(response.data); // Assuming response.data is an array of user objects
+        setUsers(response.data);
+        setFilteredUsers(response.data);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     };
 
     fetchUsers();
-  }, [users]);
+  }, []);
+
+  useEffect(() => {
+    const filtered = users.filter(user =>
+      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.firstname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.lastname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.role.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [searchQuery, users]);
 
   const handleUpdate = (userId) => {
-    // Function to handle update user action
-    console.log(`Update user with ID: ${userId}`);
-    // Implement your logic for update
-    setModalMessage(`Update user with ID ${userId}.`); // Example message
-    setShowModal(true);
+    localStorage.setItem('userId', userId);
+    navigate('/fupdate');
   };
 
   const handleDelete = async (userId) => {
     try {
-      // Function to handle delete user action
-      console.log(`Delete user with ID: ${userId}`);
-      // Implement your logic for delete
       const token = localStorage.getItem("token");
       const role = localStorage.getItem("role");
-      await axios.delete(`http://localhost:5000/admin/${userId}`,{
+      await axios.delete(`http://localhost:5000/admin/${userId}`, {
         headers: {
           Authorization: token,
           role: role
@@ -55,6 +67,7 @@ const GetUsers = () => {
       });
       setModalMessage(`User with ID ${userId} was successfully deleted.`);
       setShowModal(true);
+      setUsers(users.filter(user => user._id !== userId)); // Update the users state
     } catch (error) {
       console.error('Error deleting user:', error);
       setModalMessage(`Failed to delete user with ID ${userId}.`);
@@ -67,10 +80,34 @@ const GetUsers = () => {
     setModalMessage('');
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div className="container mx-auto">
       <h2 className="text-2xl font-bold mb-4">Users List</h2>
-      <table className="min-w-full divide-y divide-gray-200">
+      <div className='flex justify-end pb-4'>
+      <TextField
+        label="Search"
+        variant="outlined"
+       
+        value={searchQuery}
+        onChange={handleSearchChange}
+       
+      />
+      </div>
+      <div>
+      <table className="min-w-full divide-y divide-gray-200 table-auto border-2">
         <thead className="bg-gray-50">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
@@ -81,30 +118,39 @@ const GetUsers = () => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {users.map((user) => (
+          {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((user) => (
             <tr key={user._id}>
               <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
               <td className="px-6 py-4 whitespace-nowrap">{user.firstname}</td>
               <td className="px-6 py-4 whitespace-nowrap">{user.lastname}</td>
               <td className="px-6 py-4 whitespace-nowrap">{user.role}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <button
+                <Button
                   onClick={() => handleUpdate(user._id)}
-                  className="text-indigo-600 hover:text-indigo-900"
+                  sx={{ mr: 2 }}
                 >
                   Update
-                </button>
-                <button
+                </Button>
+                <Button
+                  color="danger"
                   onClick={() => handleDelete(user._id)}
-                  className="ml-2 text-red-600 hover:text-red-900"
                 >
                   Delete
-                </button>
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
+      <TablePagination
+        component="div"
+        count={filteredUsers.length}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
       {showModal && (
         <Modal
           aria-labelledby="modal-title"

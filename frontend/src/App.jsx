@@ -9,6 +9,7 @@ const Signin = lazy(() => import('./pages/Signin'));
 const Signup = lazy(() => import('./pages/Signup'));
 const Admin = lazy(() => import('./pages/Admin'));
 const User = lazy(() => import('./pages/User'));
+const Update = lazy(() => import('./pages/Update'));
 import Loading from './assets/Loading';
 export default function App() {
   return (
@@ -17,11 +18,12 @@ export default function App() {
       <BrowserRouter>
       
       <Routes>
-      <Route path="f" element={<Suspense fallback={<Loading/>}><Home/></Suspense>} />
+      <Route path="/" element={<Suspense fallback={<Loading/>}><Home/></Suspense>} />
       <Route path="/fsignup" element={<Suspense fallback={<Loading/>}><Signup/></Suspense>} />
       <Route path="/fsignin" element={<Suspense fallback={<Loading/>}><Signin/></Suspense>} />
       <Route path="/fuser" element={<Suspense fallback={<Loading/>}><User/></Suspense>}/>
       <Route path="/fadmin" element={<Suspense fallback={<Loading/>}><Admin/></Suspense>}/>
+      <Route path='/fupdate' element={<Suspense fallback={<Loading/>}><Update/></Suspense>}/>
       </Routes>
     </BrowserRouter>
         </div>

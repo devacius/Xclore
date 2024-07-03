@@ -39,8 +39,24 @@ const SignInForm = () => {
         }
       })
       .catch(error => {
-        setError('An error occurred during signin. Please try again.');
-        console.error('There was an error!', error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          if (error.response.status === 404) {
+            setError('User not found');
+          } else if (error.response.status === 401) {
+            setError('Invalid credentials');
+          } else if (error.response.status === 411) {
+            setError('Invalid input');
+          } else if (error.response.status === 500) {
+            setError('Internal server error');
+          } else {
+            setError('An unexpected error occurred');
+          }
+        }
+        else{
+          setError('An unexpected error occurred');
+        }
       });
   };
 

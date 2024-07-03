@@ -1,7 +1,15 @@
 const express= require("express");
-
+const jwt=require("jsonwebtoken");
+const zod=require("zod");
+const bcrypt=require("bcrypt");
 const User=require("../models/User");
 const adminrouter=express.Router();
+const schema=zod.object({
+  email:zod.string().email(),
+  password:zod.string().min(6),
+  firstname:zod.string(),
+  lastname:zod.string()
+});
 adminrouter.get("/",async (req,res)=>{
     
         const users = await User.find({});
@@ -9,39 +17,98 @@ adminrouter.get("/",async (req,res)=>{
       });
 
       adminrouter.post("/",async (req,res)=>{
-        const { firstName, lastName, email, password, role } = req.body;
-        const userExists = await User.findOne({ email });
-      
-        if (userExists) {
-          return res.status(400).json({ message: 'User already exists' });
-        }
-      
-        const user = await User.create({ firstName, lastName, email, password, role });
-      
-        if (user) {
-          res.status(201).json(user);
-        } else {
-          res.status(400).json({ message: 'Invalid user data' });
-        }
+        try{
+          const result =schema.safeParseAsync(req.body);
+          if(!result){
+              return res.status(411).json({
+                  msg:"Invalid input"
+              })
+          }
+          
+         const existinguser=await User.findOne({email:req.body.email});
+          if(existinguser){
+              return res.status(409).json({
+                  msg:"User already exists"
+              })
+          }
+         
+          bcrypt.hash(req.body.password,10,async (err,hash)=>{
+              if(err){
+                  return res.status(500).json({
+                      msg:"Internal Server Error due to password hashing"
+                  })
+              }
+              const user=await  User.create({
+                  email:req.body.email,
+                  password:hash,
+                  firstname:req.body.firstname,
+                  lastname:req.body.lastname,
+                  role:req.body.role || "user"
+              });
+              
+              const token=jwt.sign({userId:user._id},process.env.JWT_SECRET);
+             
+              res.status(201).json({
+                  msg:"User created",
+                  token:token,
+                  role:user.role
+              })
+          })
+      }
+      catch(err){
+          return res.status(500).json({
+              msg:"Internal Server Error"
+          })
+      }   
       })
       
       
         
 adminrouter.put("/:id", async (req,res)=>{
-    const user = await User.findById(req.params.id);
-      
-    if (user) {
-      user.firstname = req.body.firstname || user.firstname;
-      user.lastname = req.body.lastname || user.lastname;
-      user.email = req.body.email || user.email;
-      user.role = req.body.role || user.role;
-  
-      const updatedUser = await user.save();
-      res.json(updatedUser);
-    } else {
-      res.status(404).json({ message: 'User not found' });
+  try{
+    const result =schema.safeParseAsync(req.body);
+    if(!result){
+        return res.status(411).json({
+            msg:"Invalid input"
+        })
     }
-    });
+    
+   const existinguser=await User.findById(req.params.id);
+    if(!existinguser){
+        return res.status(409).json({
+            msg:"User not found"
+        })
+    }
+    bcrypt.hash(req.body.password,10,async (err,hash)=>{
+      if(err){
+          return res.status(500).json({
+              msg:"Internal Server Error due to password hashing"
+          })
+      }
+      const user=await  existinguser.updateOne({
+          email:req.body.email,
+          password:hash,
+          firstname:req.body.firstname,
+          lastname:req.body.lastname,
+          role:req.body.role || "user"
+      });
+      
+      const token=jwt.sign({userId:user._id},process.env.JWT_SECRET);
+     
+      res.status(201).json({
+          msg:"User updated",
+          token:token,
+          role:user.role
+      })
+  })
+}
+catch(err){
+  return res.status(500).json({
+      msg:"Internal Server Error"
+  })
+}   
+
+  });
       
       
   

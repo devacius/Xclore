@@ -33,7 +33,7 @@ signuprouter.post("/",async (req,res)=>{
        
         bcrypt.hash(req.body.password,10,async (err,hash)=>{
             if(err){
-                return res.status(500).json({
+                return res.status(411).json({
                     msg:"Internal Server Error due to password hashing"
                 })
             }

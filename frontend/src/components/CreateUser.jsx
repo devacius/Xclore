@@ -3,7 +3,7 @@ import axios from 'axios';
 import {useNavigate } from 'react-router-dom';
 
 import Cookies from 'js-cookie';
-const SignupForm = () => {
+const CreateUser = () => {
     const url=import.meta.env.YOUR_BACKEND_URL;
   const [formData, setFormData] = useState({
     email: '',
@@ -31,16 +31,7 @@ const SignupForm = () => {
     
     axios.post("http://localhost:5000/signup", formData)
       .then(response => {
-        const { role, token } = response.data;
-        console.log(role);
-        console.log('token', token  );
-        localStorage.setItem("token",token);
-        localStorage.setItem("role",role);
-        if (role === 'admin') {
-          navigate('/fadmin');
-        } else {
-          navigate('/fuser');
-        }
+        navigate('/fadmin');
       })
       .catch(error => {
         if (error.response) {
@@ -64,7 +55,7 @@ const SignupForm = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Create new User</h2>
         {error && <div className="mb-4 text-red-600">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -147,7 +138,7 @@ const SignupForm = () => {
               type="submit"
               className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Sign Up
+              Create
             </button>
           </div>
         </form>
@@ -156,4 +147,4 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+export default CreateUser;

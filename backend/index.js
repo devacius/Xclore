@@ -28,8 +28,8 @@ app.get("/", (req, res) => {
 connectDB();
 app.use("/signup",signuprouter);
 app.use("/signin",signinrouter);
-app.use("/user",userrouter);
-app.use("/admin",authMiddleware,adminrouter);
+app.use("/user",authMiddleware,userrouter);
+app.use("/admin",authMiddleware,adminMiddleware,adminrouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
