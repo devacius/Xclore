@@ -12,3 +12,6 @@ Example includes
 
 4) run nodemon index.js in backend directory.
 5) run npm run dev in frontend directory. 
+## Incase of Error
+1) Try deleting the test database in MONGODB compass.
+2) Restart the server.
