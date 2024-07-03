@@ -4,9 +4,9 @@
 1) git clone the repository.
 2) use npm install in both backend and frontend .
 3) Create a .env.local file in backend directory having -
-. PORT number
-. mongodb url
-. JWT_secret 
+- PORT number
+- mongodb url
+- JWT_secret 
 Example includes 
 ![alt text](image-1.png)
 
