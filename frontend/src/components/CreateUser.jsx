@@ -29,7 +29,7 @@ const CreateUser = () => {
     e.preventDefault();
     setError(null);
     
-    axios.post("http://localhost:5000/signup", formData)
+    axios.post(import.meta.env.VITE_APP_BACKEND_URL+"/signup", formData)
       .then(response => {
         navigate('/fadmin');
       })

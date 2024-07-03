@@ -34,7 +34,7 @@ const UpdateForm = () => {
     console.log(role);
 
     axios.put(
-      `http://localhost:5000/admin/${userId}`,
+      `${import.meta.env.VITE_APP_BACKEND_URL}/admin/${userId}`,
       formData,
       {
         headers: {

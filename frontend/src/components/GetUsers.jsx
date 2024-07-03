@@ -24,7 +24,7 @@ const GetUsers = () => {
       try {
         const token = localStorage.getItem("token");
         const role = localStorage.getItem("role");
-        const response = await axios.get('http://localhost:5000/admin', {
+        const response = await axios.get(import.meta.env.VITE_APP_BACKEND_URL+'/admin', {
           headers: {
             Authorization: token,
             role: role

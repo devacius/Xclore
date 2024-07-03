@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import {useNavigate } from 'react-router-dom';
 
-import Cookies from 'js-cookie';
 const SignupForm = () => {
-    const url=import.meta.env.YOUR_BACKEND_URL;
+   
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -28,8 +28,8 @@ const SignupForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    
-    axios.post("http://localhost:5000/signup", formData)
+    //console.log(import.meta.env.VITE_APP_BACKEND_URL);
+    axios.post(import.meta.env.VITE_APP_BACKEND_URL+"/signup", formData)
       .then(response => {
         const { role, token } = response.data;
         console.log(role);
